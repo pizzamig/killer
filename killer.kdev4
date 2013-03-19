@@ -1,0 +1,4 @@
+[Project]
+Name=killer
+Manager=KDevCMakeManager
+VersionControl=kdevgit
