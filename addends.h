@@ -17,7 +17,9 @@ public:
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const uint8_t & W, const std::set<uint8_t> & WO ); // with and without variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & W, const uint8_t & WO ); // with and without variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const uint8_t & W, const uint8_t & WO ); // with and without variant
-  enum LIMITS { MIN_SUM = 3, MIN_ADDENDS_NUMBER = 2 };
+  enum LIMITS { MIN_SUM = 3, MIN_ADDENDS_NUMBER = 2,
+    MAX_SUM_2 = 17, MIN_SUM_3 = 6, MAX_SUM_3 = 24
+  };
 private:
   
   bool _oneMore(std::set< uint8_t >& ws, uint8_t last );

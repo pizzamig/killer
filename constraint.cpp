@@ -1,10 +1,18 @@
 #include "constraint.h"
 #include "addends.h"
 
-Constraint::Constraint(const uint8_t sum, std::set< Cell >& s ) : m_sum( sum ), m_cells( s )
+using namespace std;
+
+Constraint::Constraint(const uint8_t sum, vector< Cell* > * s ) : m_sum( sum ), m_cells( s )
 {
-  Addends a(m_sum, m_cells.size());
+  Addends a(m_sum, m_cells->size());
   a.pushAddends();
-  std::set< uint8_t > possibles = a.getPossibles();
-  
+  m_possibles = a.getPossibles();
+}
+
+void Constraint::link()
+{
+  for( vector< Cell * >::iterator i = m_cells->begin(); i != m_cells->end(); ++i) {
+    (*i)->addConstraint( this );
+  }
 }
