@@ -431,8 +431,8 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
     if( _solve( i ) == true ) {
       return true;
     }
-    (*i)->setValue( 0 );
     --i;
+    (*i)->setValue( 0 );
   }
   return false;
 }
