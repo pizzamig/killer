@@ -26,9 +26,15 @@ public:
   void show() const;
   uint8_t getRow() const { return m_coord.getRow(); }
   uint8_t getColumn() const { return m_coord.getColumn(); }
+  Coordinate::Dial_e getDial() const { return m_coord.getDial(); }
   void addConstraint( Constraint * );
+  bool hasValue() const { return m_value != 0; }
+  void setValue( uint8_t v ) { m_value = v; }
+  uint8_t getValue() const { return m_value; }
 private:
+  void _intersectPossible( std::set< uint8_t >& p );
   std::set< uint8_t > possibles;
   Coordinate m_coord;
   std::set< Constraint * > constraints;
+  uint8_t m_value;
 };

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Addends::Addends(uint8_t sum, uint8_t an) : m_sum(sum) , m_an(an), m_possibles()
+Addends::Addends(uint8_t sum, uint8_t an) : m_sum(sum) , m_an(an), S(), m_possibles()
 {
   assert( m_sum >= MIN_SUM );
   assert( m_an >= MIN_ADDENDS_NUMBER );
@@ -17,13 +17,49 @@ Addends::Addends(uint8_t sum, uint8_t an) : m_sum(sum) , m_an(an), m_possibles()
   }
 }
 
+void Addends::_updatePossibles()
+{
+  m_possibles.clear();
+  for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
+    for( set<uint8_t>::iterator j = (*i).begin(); j != (*i).end(); ++j ) {
+      m_possibles.insert( (*j));
+    }
+  }
+}
+
+void Addends::pushAddendsW(const uint8_t W)
+{
+  pushAddends();
+  for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
+    if( (*i).find( W ) == (*i).end() ) {
+      S.erase( *i );
+    }
+  }
+  _updatePossibles();
+}
+
+void Addends::pushAddendsW(const set< uint8_t >& W)
+{
+  pushAddends();
+  for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
+    for( set< uint8_t >::iterator j = W.begin(); j != W.end(); ++j ) {
+      if( (*i).find( (*j) ) == (*i).end() ) {
+	S.erase( *i );
+      }
+    }
+  }
+  _updatePossibles();
+}
+
 void Addends::pushAddends()
 {
+  S.clear();
   for( uint8_t i = 1; i <= 9; ++i ) {
     set< uint8_t > tmp;
     tmp.insert(i);
     _oneMore( tmp, i );
   }
+  _updatePossibles();
 }
 
 bool Addends::_oneMore(set< uint8_t >& ws, uint8_t last)
@@ -40,9 +76,6 @@ bool Addends::_oneMore(set< uint8_t >& ws, uint8_t last)
     ws.insert( i );
     if( _oneMore( ws, i) ) {
       S.insert( ws );
-      for( set<uint8_t>::iterator j = ws.begin(); j!=ws.end(); ++j ) {
-	m_possibles.insert( *j );
-      }
     }
     ws.erase(i);
   }

@@ -1,6 +1,7 @@
 #include "cell.h"
 #include <cassert>
 #include <iostream>
+#include "constraint.h"
 
 using namespace std;
 
@@ -41,14 +42,14 @@ Coordinate::Dial_e Coordinate::getDial() const
     return Q33;
 }
 
-Cell::Cell(const Coordinate& C) : m_coord( C ), possibles(), constraints()
+Cell::Cell(const Coordinate& C) : m_coord( C ), possibles(), constraints(), m_value(0)
 {
   for( uint8_t i = 0; i < 9; ++i ) {
     possibles.insert(i+1);
   }
 }
 
-Cell::Cell(const uint8_t x, const uint8_t y) : m_coord(x, y), possibles(), constraints()
+Cell::Cell(const uint8_t x, const uint8_t y) : m_coord(x, y), possibles(), constraints(), m_value(0)
 {
   for( uint8_t i = 0; i < 9; ++i ) {
     possibles.insert(i+1);
@@ -71,6 +72,11 @@ bool Cell::applyPossibles(const set< uint8_t >& p)
 
 void Cell::show() const
 {
+  cout << " Cell (" << (int)getRow() << "," << (int)getColumn() << ") : ";
+  if( hasValue() ) {
+    cout << (int)m_value << endl;
+    return;
+  }
   for( set< uint8_t >::iterator i = possibles.begin(); i != possibles.end(); ++i ) {
     if( i != possibles.begin() ) {
       cout << " - ";
@@ -85,6 +91,17 @@ void Cell::addConstraint( Constraint * c )
   constraints.insert( c );
 }
 
+void Cell::_intersectPossible(set< uint8_t > & p)
+{
+  if( possibles.empty() || p.empty() ) return;
+  set< uint8_t > tmp(possibles);
+  for( set< uint8_t >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+    if( p.find( *i ) == p.end() ) {
+      possibles.erase( *i );
+    }
+  }
+}
+
 set< uint8_t >& Cell::getPossibles()
 {
   possibles.clear();
@@ -94,9 +111,10 @@ set< uint8_t >& Cell::getPossibles()
     }
     return possibles;
   }
-  set< uint8_t >::iterator j = constraints.begin();
+  set< Constraint * >::iterator j = constraints.begin();
   possibles = (*j)->getPossibles();
   for( ++j, j!=constraints.end(); j!=constraints.end(); ++j ) {
-    // fare intersezione
+    _intersectPossible( (*j)->getPossibles() );
   }
+  return possibles;
 }

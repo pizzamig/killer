@@ -10,6 +10,8 @@ class Board
 public:
   Board();
   void solve();
+  void show();
+  Cell * getCell( uint8_t x, uint8_t y );
 private:
   typedef vector< Cell * > Line;
   void _setDefaultCostraints();
@@ -20,4 +22,5 @@ private:
   vector< Line * > _columns;
   
   vector< Constraint * > _costraints;
+  long long iterations;
 };

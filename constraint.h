@@ -9,7 +9,7 @@ class Constraint
 public:
   Constraint( const uint8_t sum, std::vector< Cell * > * s );
   void link();
-  std::set< uint8_t > & getPossibles() { return m_possibles; }
+  std::set< uint8_t > & getPossibles();
 private:
   uint8_t m_sum;
   std::vector< Cell * > * m_cells;

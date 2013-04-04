@@ -11,8 +11,8 @@ public:
   std::set< uint8_t > & getPossibles() { return m_possibles; }
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & WO ); // without variant
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const uint8_t WO ); // without variant
-//   void pushAddendsW( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & W ); // with variant
-//   void pushAddendsW( std::set< std::set<uint8_t> > & S, const uint8_t & W ); // with variant
+  void pushAddendsW( const std::set<uint8_t> & W ); // with variant
+  void pushAddendsW( const uint8_t W ); // with variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & W, const std::set<uint8_t> & WO ); // with and without variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const uint8_t & W, const std::set<uint8_t> & WO ); // with and without variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & W, const uint8_t & WO ); // with and without variant
@@ -21,7 +21,7 @@ public:
     MAX_SUM_2 = 17, MIN_SUM_3 = 6, MAX_SUM_3 = 24
   };
 private:
-  
+  void _updatePossibles();
   bool _oneMore(std::set< uint8_t >& ws, uint8_t last );
   uint8_t _sum( std::set<uint8_t> & ws );
   void _show( const std::set< uint8_t >& ws );
