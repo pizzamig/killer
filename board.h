@@ -18,13 +18,16 @@ public:
 private:
   typedef vector< Cell * > Line;
   void _setDefaultCostraints();
-  
+  void _removeFromCostraint( Line * l, Constraint * c );
+  void _optimize1();
   bool _solve( std::vector< Cell* >::iterator );
   vector< Cell * > _board;
   vector< Line * > _rows;
   vector< Line * > _columns;
+  vector< Line * > _dials;
   
   vector< Constraint * > _costraints;
   long long iterations;
+  double iterationsMax;
   time_t startTime;
 };

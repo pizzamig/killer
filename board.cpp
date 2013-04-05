@@ -2,13 +2,15 @@
 #include "constraint.h"
 #include <iostream>
 
-Board::Board() : iterations(0)
+Board::Board() : iterations(0), iterationsMax(1)
 {
   for ( int i = 0; i < 9; ++i ) {
     Line * tmpR = new Line();
     Line * tmpC = new Line();
+    Line * tmpD = new Line();
     _rows.push_back( tmpR );
     _columns.push_back( tmpC );
+    _dials.push_back( tmpD );
   }
   for ( int i = 0; i < 9; ++i ) {
     for ( int j = 0; j < 9; ++j ) {
@@ -16,6 +18,7 @@ Board::Board() : iterations(0)
       _board.push_back( tmp );
       _rows[i]->push_back( tmp );;
       _columns[j]->push_back( tmp );
+      _dials[ tmp->getDial() ]->push_back( tmp );
     }
   }
   _setDefaultCostraints();
@@ -31,6 +34,7 @@ void Board::_setDefaultCostraints()
     }
     Constraint * c = new Constraint(45, tmp);
     c->link();
+    _costraints.push_back( c );
   }
   /* column constraint */
   for( vector< Line * >::iterator i = _columns.begin(); i != _columns.end(); ++i ) {
@@ -40,6 +44,7 @@ void Board::_setDefaultCostraints()
     }
     Constraint * c = new Constraint( 45, tmp );
     c->link();
+    _costraints.push_back( c );
   }
   /* dial constraint */
   vector< Cell * > * tmp11 = new vector< Cell *>();
@@ -100,7 +105,15 @@ void Board::_setDefaultCostraints()
   c32->link();
   Constraint * c33 = new Constraint( 45, tmp33 );
   c33->link();
-
+  _costraints.push_back( c11 );
+  _costraints.push_back( c12 );
+  _costraints.push_back( c13 );
+  _costraints.push_back( c21 );
+  _costraints.push_back( c22 );
+  _costraints.push_back( c23 );
+  _costraints.push_back( c31 );
+  _costraints.push_back( c32 );
+  _costraints.push_back( c33 );
   {
     Cell * c1 = getCell( 1, 7 );
     Cell * c2 = getCell( 1, 8 );
@@ -109,6 +122,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c2 );
     Constraint * cc1 = new Constraint( 7, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 2, 5 );
@@ -118,6 +132,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c2 );
     Constraint * cc1 = new Constraint( 11, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 6, 5 );
@@ -127,6 +142,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c2 );
     Constraint * cc1 = new Constraint( 7, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 7, 7 );
@@ -136,6 +152,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c2 );
     Constraint * cc1 = new Constraint( 14, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 0, 0 );
@@ -147,6 +164,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 24, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 0, 5 );
@@ -158,6 +176,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 18, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 0, 6 );
@@ -169,6 +188,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 15, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 2, 7 );
@@ -180,6 +200,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 9, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
 
   {
@@ -192,6 +213,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 21, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
 
   {
@@ -204,6 +226,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 18, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 7, 5 );
@@ -215,6 +238,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 15, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 8, 6 );
@@ -226,6 +250,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c3 );
     Constraint * cc1 = new Constraint( 6, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 2, 0 );
@@ -239,6 +264,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c4 );
     Constraint * cc1 = new Constraint( 21, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 3, 0 );
@@ -252,6 +278,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c4 );
     Constraint * cc1 = new Constraint( 11, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 5, 1 );
@@ -265,8 +292,8 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c4 );
     Constraint * cc1 = new Constraint( 21, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
-
   {
     Cell * c1 = getCell( 0, 1 );
     Cell * c2 = getCell( 0, 2 );
@@ -281,6 +308,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c5 );
     Constraint * cc1 = new Constraint( 19, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 1, 2 );
@@ -296,6 +324,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c5 );
     Constraint * cc1 = new Constraint( 28, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 3, 7 );
@@ -311,6 +340,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c5 );
     Constraint * cc1 = new Constraint( 30, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 6, 2 );
@@ -326,6 +356,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c5 );
     Constraint * cc1 = new Constraint( 25, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 7, 4 );
@@ -341,6 +372,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c5 );
     Constraint * cc1 = new Constraint( 27, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 3, 3 );
@@ -358,6 +390,7 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c6 );
     Constraint * cc1 = new Constraint( 22, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
   {
     Cell * c1 = getCell( 3, 5 );
@@ -375,8 +408,40 @@ void Board::_setDefaultCostraints()
     tmp->push_back( c6 );
     Constraint * cc1 = new Constraint( 36, tmp );
     cc1->link();
+    _costraints.push_back( cc1 );
   }
+}
 
+void Board::_removeFromCostraint(Board::Line* l, Constraint* c)
+{
+  set<uint8_t> solution = c->getPossibles();
+  for( Line::iterator i = l->begin(); i != l->end(); ++i ) {
+    if( c->hasCell( (*i) ) == false ) {
+      for( set<uint8_t>::iterator j = solution.begin(); j != solution.end(); ++j ) {
+	(*i)->addNotPossibles( (*j) );
+      }
+    }
+  }
+}
+
+void Board::_optimize1()
+{
+  for( vector< Constraint * >::iterator i = _costraints.begin(); i != _costraints.end(); ++i ) {
+    if( (*i)->hasOneSolution() ) {
+      if( (*i)->hasSameColumn() ) {
+	Line * l = _columns.at( (*i)->getColumn() );
+	_removeFromCostraint( l, (*i) );
+      }
+      if( (*i)->hasSameRow() ) {
+	Line * l = _rows.at( (*i)->getRow() );
+	_removeFromCostraint( l, (*i) );
+      }
+      if( (*i)->hasSameDial() ) {
+	Line * l = _dials.at( (*i)->getDial() );
+	_removeFromCostraint( l, (*i) );
+      }
+    }
+  }
 }
 
 Cell* Board::getCell(uint8_t x, uint8_t y)
@@ -406,6 +471,18 @@ void Board::show()
 
 void Board::solve()
 {
+  iterationsMax = 1;
+  for( vector< Cell *>::iterator i = _board.begin(); i != _board.end(); ++i ) {
+    set< uint8_t > p = (*i)->getPossibles();
+    iterationsMax *= p.size();
+  }
+  cout << "Iterations MAX: " << iterationsMax << endl;
+  _optimize1();
+  double iterationsMax1 = 1.;
+  for( vector< Cell *>::iterator i = _board.begin(); i != _board.end(); ++i ) {
+    iterationsMax1 *= (*i)->getPossibles().size();
+  }
+  cout << "Iterations MAX after preoptimization: " << iterationsMax1 << endl;
   startTime = time(0);
   if( _solve( _board.begin() ) ) {
     cout << "Finish" << endl;

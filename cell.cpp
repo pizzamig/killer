@@ -42,14 +42,14 @@ Coordinate::Dial_e Coordinate::getDial() const
     return Q33;
 }
 
-Cell::Cell(const Coordinate& C) : m_coord( C ), possibles(), constraints(), m_value(0)
+Cell::Cell(const Coordinate& C) : m_coord( C ), possibles(), constraints(), m_value(0), notPossibles()
 {
   for( uint8_t i = 0; i < 9; ++i ) {
     possibles.insert(i+1);
   }
 }
 
-Cell::Cell(const uint8_t x, const uint8_t y) : m_coord(x, y), possibles(), constraints(), m_value(0)
+Cell::Cell(const uint8_t x, const uint8_t y) : m_coord(x, y), possibles(), constraints(), m_value(0), notPossibles()
 {
   for( uint8_t i = 0; i < 9; ++i ) {
     possibles.insert(i+1);
@@ -116,5 +116,13 @@ set< uint8_t >& Cell::getPossibles()
   for( ++j, j!=constraints.end(); j!=constraints.end(); ++j ) {
     _intersectPossible( (*j)->getPossibles() );
   }
+  for( set<uint8_t>::iterator k = notPossibles.begin(); k != notPossibles.end(); ++k ) {
+    possibles.erase( (*k) );
+  }
   return possibles;
+}
+
+void Cell::addNotPossibles(uint8_t n)
+{
+  notPossibles.insert( n );
 }

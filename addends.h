@@ -9,6 +9,7 @@ public:
   void pushAddends();
   void show();
   std::set< uint8_t > & getPossibles() { return m_possibles; }
+  bool hasUniqueSolution() const { return S.size() == 1; }
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & WO ); // without variant
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const uint8_t WO ); // without variant
   void pushAddendsW( const std::set<uint8_t> & W ); // with variant

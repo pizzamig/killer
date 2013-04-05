@@ -23,6 +23,7 @@ public:
   Cell( const uint8_t x, const uint8_t y );
   std::set< uint8_t > & getPossibles();
   bool applyPossibles( const std::set< uint8_t > & p );
+  void addNotPossibles( uint8_t n );
   void show() const;
   uint8_t getRow() const { return m_coord.getRow(); }
   uint8_t getColumn() const { return m_coord.getColumn(); }
@@ -34,6 +35,7 @@ public:
 private:
   void _intersectPossible( std::set< uint8_t >& p );
   std::set< uint8_t > possibles;
+  std::set< uint8_t > notPossibles;
   Coordinate m_coord;
   std::set< Constraint * > constraints;
   uint8_t m_value;
