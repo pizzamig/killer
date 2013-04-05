@@ -397,11 +397,16 @@ void Board::show()
     }
     cout << endl;
   }
-  cout << "iterations: " << dec << iterations << endl;
+  float iSpeed = 0.;
+  time_t elapsed = time(0) - startTime;
+  iSpeed = (float)iterations / (float)elapsed;
+  cout << "iterations: " << iterations << "  speed :" << iSpeed << endl;
+  cout << "elapsed time: " << elapsed << endl;
 }
 
 void Board::solve()
 {
+  startTime = time(0);
   if( _solve( _board.begin() ) ) {
     cout << "Finish" << endl;
   } else {
@@ -410,14 +415,13 @@ void Board::solve()
   show();
 }
 
-
 bool Board::_solve( std::vector< Cell* >::iterator i )
 {
   if( i == _board.end() ) {
     return true;
   }
   ++iterations;
-  if( iterations % 5000 == 0 ) {
+  if( iterations % 10000 == 0 ) {
     show();
   }
   set< uint8_t > p = (*i)->getPossibles();
@@ -425,7 +429,6 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
     return false;
   }
   for( set< uint8_t >::iterator j = p.begin(); j != p.end(); ++j ) {
-//     ++iterations;
     (*i)->setValue( *j );
     ++i;
     if( _solve( i ) == true ) {

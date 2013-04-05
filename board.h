@@ -1,6 +1,9 @@
 #pragma once
 #include "cell.h"
 #include <vector>
+
+#include <time.h>
+
 class Constraint;
 
 using namespace std;
@@ -23,4 +26,5 @@ private:
   
   vector< Constraint * > _costraints;
   long long iterations;
+  time_t startTime;
 };
