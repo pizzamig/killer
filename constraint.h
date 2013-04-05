@@ -16,7 +16,7 @@ public:
   bool hasSameColumn();
   bool hasOneSolution() const { return m_uniqueSolution; }
   bool hasCell( Cell * c );
-  
+  std::vector< Cell * > * getCells() { return m_cells; }
   uint8_t getColumn();
   uint8_t getRow();
   Coordinate::Dial_e getDial();

@@ -2,7 +2,7 @@
 #include "constraint.h"
 #include <iostream>
 
-Board::Board() : iterations(0), iterationsMax(1)
+Board::Board() : iterations(0), iterationsMax(1), m_usingOptiBoard( false )
 {
   for ( int i = 0; i < 9; ++i ) {
     Line * tmpR = new Line();
@@ -424,6 +424,10 @@ void Board::_removeFromCostraint(Board::Line* l, Constraint* c)
   }
 }
 
+/* This optimization look for costraints that have only one admittable solution
+ * If the costraint fit a row or a column and/or a dial, this solution is removed from the possibles
+ * solutions of the other cell (of the same row, column or cell)
+ */
 void Board::_optimize1()
 {
   for( vector< Constraint * >::iterator i = _costraints.begin(); i != _costraints.end(); ++i ) {
@@ -469,6 +473,53 @@ void Board::show()
   cout << "elapsed time: " << elapsed << endl;
 }
 
+void Board::_optimize()
+{
+  double preEstimation = 1; // to force the first run
+  double postEstimation = iterationsMax;
+  while( preEstimation != postEstimation ) {
+    preEstimation = postEstimation;
+    _optimize1();
+    for( vector< Cell *>::iterator i = _board.begin(); i != _board.end(); ++i ) {
+      postEstimation *= (*i)->getPossibles().size();
+    }
+  }
+}
+
+bool Board::_buildOptiboard()
+{
+  vector< Constraint * > tmp = _costraints;
+  for( vector< Constraint *>::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+    if( (*i)->getSize() == 9 ) {
+      tmp.erase( i );
+      --i;
+    } else {
+      if( (*i)->hasOneSolution() ) {
+	vector< Cell * > * c = (*i)->getCells();
+	for( vector< Cell * >::iterator j = c->begin(); j != c->end(); ++j ) {
+	  _optiBoard.push_back( (*j) );
+	}
+	tmp.erase( i );
+	--i;
+      }
+    }
+  }
+  for( vector< Constraint *>::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+    if( (*i)->getSize() == 9 ) {
+      continue;
+    }
+    vector< Cell * > * c = (*i)->getCells();
+    for( vector< Cell * >::iterator j = c->begin(); j != c->end(); ++j ) {
+      _optiBoard.push_back( (*j) );
+    }
+  }
+  if ( _optiBoard.size() == 81 ) {
+    return true;
+  } else { /* 9-element costraint creates a problem */
+    return false;
+  }
+}
+
 void Board::solve()
 {
   iterationsMax = 1;
@@ -476,26 +527,43 @@ void Board::solve()
     set< uint8_t > p = (*i)->getPossibles();
     iterationsMax *= p.size();
   }
-  cout << "Iterations MAX: " << iterationsMax << endl;
-  _optimize1();
+  cout << "Iterations MAX (overestimation): " << iterationsMax << endl;
+  _optimize();
   double iterationsMax1 = 1.;
   for( vector< Cell *>::iterator i = _board.begin(); i != _board.end(); ++i ) {
     iterationsMax1 *= (*i)->getPossibles().size();
   }
-  cout << "Iterations MAX after preoptimization: " << iterationsMax1 << endl;
+  cout << "Iterations MAX after preoptimization (overestimation): " << iterationsMax1 << endl;
+  m_usingOptiBoard = _buildOptiboard();
   startTime = time(0);
-  if( _solve( _board.begin() ) ) {
-    cout << "Finish" << endl;
+  if( m_usingOptiBoard ) {
+    cout << "Using Optimized board" << endl;
+    if( _solve( _optiBoard.begin() ) ) {
+      cout << "Finish" << endl;
+    } else {
+      cout << "Failed" << endl;
+    }
   } else {
-    cout << "Failed" << endl;
+    cout << "Using standard board" << endl;
+    if( _solve( _board.begin() ) ) {
+      cout << "Finish" << endl;
+    } else {
+      cout << "Failed" << endl;
+    }
   }
   show();
 }
 
 bool Board::_solve( std::vector< Cell* >::iterator i )
 {
-  if( i == _board.end() ) {
-    return true;
+  if( m_usingOptiBoard ) {
+    if( i == _optiBoard.end() ) {
+      return true;
+    }
+  } else {
+    if( i == _board.end() ) {
+      return true;
+    }
   }
   ++iterations;
   if( iterations % 10000 == 0 ) {

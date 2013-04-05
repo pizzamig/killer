@@ -61,6 +61,7 @@ bool Cell::applyPossibles(const set< uint8_t >& p)
   for( set< uint8_t >::iterator i = possibles.begin(); i != possibles.end(); ++i ) {
     if ( p.find( *i ) == p.end() ) {
       possibles.erase( *i );
+      --i;
     }
   }
   if( possibles.empty() ) {
