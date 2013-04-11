@@ -18,6 +18,9 @@ public:
 private:
   typedef vector< Cell * > Line;
   void _setDefaultCostraints();
+  void _setBoard1();
+  void _setBoard2();
+  void _setBoard3();
   void _removeFromCostraint( Board::Line* l, Constraint* c );
   void _removeFromCostraint( Board::Line* l, Constraint* c, set< uint8_t >& solution );
   void _optimize();
