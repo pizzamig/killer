@@ -574,7 +574,7 @@ bool Board::_isImpossible(Cell* c)
     }
     tmp.insert( *i );
   }
-  if( tmp.size() > 9 ) {
+  if( tmp.size() > 7 ) {
     return false;
   } else {
     for( set< Cell * >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
@@ -632,7 +632,7 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
     }
   }
   ++iterations;
-  if( iterations % 10000 == 0 ) {
+  if( iterations % 50000 == 0 ) {
     show();
   }
   uSet p = (*i)->getPossibles();
@@ -643,7 +643,7 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
     (*i)->setValue( *j );
     if( _isImpossible( (*i) ) ) {
       ++iterations;
-      if( iterations % 10000 == 0 ) {
+      if( iterations % 50000 == 0 ) {
 	show();
       }
       (*i)->setValue( 0 );
