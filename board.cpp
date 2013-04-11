@@ -414,7 +414,11 @@ void Board::_setDefaultCostraints()
 
 void Board::_removeFromCostraint(Board::Line* l, Constraint* c)
 {
-  set<uint8_t> solution = c->getPossibles();
+  _removeFromCostraint( l, c, c->getPossibles() );
+}
+
+void Board::_removeFromCostraint(Board::Line* l, Constraint* c, set<uint8_t> & solution )
+{
   for( Line::iterator i = l->begin(); i != l->end(); ++i ) {
     if( c->hasCell( (*i) ) == false ) {
       for( set<uint8_t>::iterator j = solution.begin(); j != solution.end(); ++j ) {
@@ -431,7 +435,7 @@ void Board::_removeFromCostraint(Board::Line* l, Constraint* c)
 void Board::_optimize1()
 {
   for( vector< Constraint * >::iterator i = _costraints.begin(); i != _costraints.end(); ++i ) {
-    if( (*i)->hasOneSolution() ) {
+    if( (*i)->getSize() != 9 && (*i)->hasOneSolution() ) {
       if( (*i)->hasSameColumn() ) {
 	Line * l = _columns.at( (*i)->getColumn() );
 	_removeFromCostraint( l, (*i) );
@@ -443,6 +447,31 @@ void Board::_optimize1()
       if( (*i)->hasSameDial() ) {
 	Line * l = _dials.at( (*i)->getDial() );
 	_removeFromCostraint( l, (*i) );
+      }
+    }
+  }
+}
+
+/* This optimization look for costraints that have mandatory elements
+ * If the costraint fit a row or a column and/or a dial, these elements are removed from the possibles
+ * solutions of the other cell (of the same row, column or cell)
+ */
+void Board::_optimize2()
+{
+  for( vector< Constraint * >::iterator i = _costraints.begin(); i != _costraints.end(); ++i ) {
+    set< uint8_t > tmp;
+    if( (*i)->getSize() != 9 && (*i)->hasMandatoryElements( tmp ) ) {
+      if( (*i)->hasSameColumn() ) {
+	Line * l = _columns.at( (*i)->getColumn() );
+	_removeFromCostraint( l, (*i), tmp );
+      }
+      if( (*i)->hasSameRow() ) {
+	Line * l = _rows.at( (*i)->getRow() );
+	_removeFromCostraint( l, (*i), tmp );
+      }
+      if( (*i)->hasSameDial() ) {
+	Line * l = _dials.at( (*i)->getDial() );
+	_removeFromCostraint( l, (*i), tmp );
       }
     }
   }
@@ -480,6 +509,7 @@ void Board::_optimize()
   while( preEstimation != postEstimation ) {
     preEstimation = postEstimation;
     _optimize1();
+    _optimize2();
     for( vector< Cell *>::iterator i = _board.begin(); i != _board.end(); ++i ) {
       postEstimation *= (*i)->getPossibles().size();
     }
@@ -515,9 +545,45 @@ bool Board::_buildOptiboard()
   }
   if ( _optiBoard.size() == 81 ) {
     return true;
-  } else { /* 9-element costraint creates a problem */
+  } else { /* 9-element costraints create a problem */
     return false;
   }
+}
+bool Board::_isImpossibleLine(Cell* c, Board::Line* d, Board::Line* r, Board::Line* col )
+{
+  set< Cell * > tmp;
+  for( Line::iterator i = d->begin(); i != d->end(); ++i ) {
+    if((*i) == c || (*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  for( Line::iterator i = r->begin(); i != r->end(); ++i ) {
+    if((*i) == c || (*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  for( Line::iterator i = col->begin(); i != col->end(); ++i ) {
+    if((*i) == c || (*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  for( set< Cell * >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+    if( (*i)->isPossiblesEmpty() ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Board::_isImpossible(Cell* c)
+{
+  Coordinate::Dial_e dial = c->getDial();
+  uint8_t row = c->getRow();
+  uint8_t column = c->getColumn();
+  return _isImpossibleLine( c, _dials[ dial ], _rows[ row ], _columns[ column ] );
 }
 
 void Board::solve()
@@ -534,7 +600,7 @@ void Board::solve()
     iterationsMax1 *= (*i)->getPossibles().size();
   }
   cout << "Iterations MAX after preoptimization (overestimation): " << iterationsMax1 << endl;
-  m_usingOptiBoard = _buildOptiboard();
+//   m_usingOptiBoard = _buildOptiboard();
   startTime = time(0);
   if( m_usingOptiBoard ) {
     cout << "Using Optimized board" << endl;
@@ -569,12 +635,20 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
   if( iterations % 10000 == 0 ) {
     show();
   }
-  set< uint8_t > p = (*i)->getPossibles();
+  uSet p = (*i)->getPossibles();
   if( p.empty() ) {
     return false;
   }
-  for( set< uint8_t >::iterator j = p.begin(); j != p.end(); ++j ) {
+  for( uSet::iterator j = p.begin(); j != p.end(); ++j ) {
     (*i)->setValue( *j );
+//     if( _isImpossible( (*i) ) ) {
+//       ++iterations;
+//       if( iterations % 10000 == 0 ) {
+// 	show();
+//       }
+//       (*i)->setValue( 0 );
+//       continue;
+//     }
     ++i;
     if( _solve( i ) == true ) {
       return true;

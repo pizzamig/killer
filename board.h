@@ -18,11 +18,15 @@ public:
 private:
   typedef vector< Cell * > Line;
   void _setDefaultCostraints();
-  void _removeFromCostraint( Line * l, Constraint * c );
+  void _removeFromCostraint( Board::Line* l, Constraint* c );
+  void _removeFromCostraint( Board::Line* l, Constraint* c, set< uint8_t >& solution );
   void _optimize();
   void _optimize1();
+  void _optimize2();
   bool _solve( std::vector< Cell* >::iterator );
   bool _buildOptiboard();
+  bool _isImpossible( Cell * c );
+  bool _isImpossibleLine( Cell* c, Board::Line* d, Board::Line* r, Board::Line* col );
   vector< Cell * > _board;
   vector< Cell * > _optiBoard;
   vector< Line * > _rows;

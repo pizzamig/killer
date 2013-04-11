@@ -56,7 +56,7 @@ Cell::Cell(const uint8_t x, const uint8_t y) : m_coord(x, y), possibles(), const
   }
 }
 
-bool Cell::applyPossibles(const set< uint8_t >& p)
+bool Cell::applyPossibles(const uSet& p)
 {
   for( set< uint8_t >::iterator i = possibles.begin(); i != possibles.end(); ++i ) {
     if ( p.find( *i ) == p.end() ) {
@@ -92,34 +92,45 @@ void Cell::addConstraint( Constraint * c )
   constraints.insert( c );
 }
 
-void Cell::_intersectPossible(set< uint8_t > & p)
+void Cell::_intersectPossible(uSet & p)
 {
   if( possibles.empty() || p.empty() ) return;
-  set< uint8_t > tmp(possibles);
-  for( set< uint8_t >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+  uSet tmp(possibles);
+  for( uSet::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
     if( p.find( *i ) == p.end() ) {
       possibles.erase( *i );
     }
   }
 }
-
-set< uint8_t >& Cell::getPossibles()
+void Cell::_updatePossibles()
 {
   possibles.clear();
-  if( constraints.empty() ) {
-    for( uint8_t i = 0; i < 9; ++i ) {
-      possibles.insert(i+1);
-    }
-    return possibles;
+  for( uint8_t i = 0; i < 9; ++i ) {
+    possibles.insert(i+1);
   }
-  set< Constraint * >::iterator j = constraints.begin();
-  possibles = (*j)->getPossibles();
-  for( ++j, j!=constraints.end(); j!=constraints.end(); ++j ) {
+  if( constraints.empty() ) {
+    return;
+  }
+  for( set< Constraint * >::iterator j = constraints.begin(); j!=constraints.end(); ++j ) {
+//     if( (*j)->getSize() == 9 ) {
+//       continue;
+//     }
     _intersectPossible( (*j)->getPossibles() );
   }
-  for( set<uint8_t>::iterator k = notPossibles.begin(); k != notPossibles.end(); ++k ) {
+  for( uSet::iterator k = notPossibles.begin(); k != notPossibles.end(); ++k ) {
     possibles.erase( (*k) );
   }
+}
+
+bool Cell::isPossiblesEmpty()
+{
+  _updatePossibles();
+  return possibles.empty();
+}
+
+uSet& Cell::getPossibles()
+{
+  _updatePossibles();
   return possibles;
 }
 

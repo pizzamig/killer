@@ -15,11 +15,9 @@ void Constraint::link()
   }
 }
 
-set< uint8_t >& Constraint::getPossibles()
+uSet& Constraint::getPossibles()
 {
   Addends a(m_sum, m_cells->size());
-  a.pushAddends();
-  m_possibles = a.getPossibles();
   set< uint8_t > with;
   for( vector< Cell * >::iterator i = m_cells->begin(); i != m_cells->end(); ++i) {
     if( (*i)->hasValue() ) {
@@ -32,9 +30,34 @@ set< uint8_t >& Constraint::getPossibles()
     for( set< uint8_t >::iterator i = with.begin(); i != with.end(); ++i ) {
       m_possibles.erase((*i));
     }
+  } else {
+    a.pushAddends();
+    m_possibles = a.getPossibles();
   }
   m_uniqueSolution = a.hasUniqueSolution();
   return m_possibles;
+}
+
+bool Constraint::hasMandatoryElements(uSet& e)
+{
+  if( hasOneSolution() ) {
+    for( set< uint8_t >::iterator i = m_possibles.begin(); i != m_possibles.end(); ++i ) {
+      e.insert( *i );
+    }
+    return true;
+  }
+  Addends a(m_sum, m_cells->size());
+  a.pushAddends();
+  set< uint8_t > with;
+  for( vector< Cell * >::iterator i = m_cells->begin(); i != m_cells->end(); ++i) {
+    if( (*i)->hasValue() ) {
+      with.insert( (*i)->getValue() );
+    }
+  }
+  if( with.empty() == false ) {
+    a.pushAddendsW( with );
+  }
+  return a.hasMandatoryElements( e );
 }
 
 bool Constraint::hasSameDial()

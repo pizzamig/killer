@@ -1,18 +1,22 @@
 #pragma once
 #include <sys/types.h>
 #include <set>
+#include "util.h"
 
+/** This class models 
+ */
 class Addends
 {
 public:
   Addends( uint8_t sum, uint8_t an );
   void pushAddends();
   void show();
-  std::set< uint8_t > & getPossibles() { return m_possibles; }
+  uSet & getPossibles() { return m_possibles; }
   bool hasUniqueSolution() const { return S.size() == 1; }
+  bool hasMandatoryElements( uSet & e );
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & WO ); // without variant
 //   void pushAddendsWo( std::set< std::set<uint8_t> > & S, const uint8_t WO ); // without variant
-  void pushAddendsW( const std::set<uint8_t> & W ); // with variant
+  void pushAddendsW( const uSet & W ); // with variant
   void pushAddendsW( const uint8_t W ); // with variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const std::set<uint8_t> & W, const std::set<uint8_t> & WO ); // with and without variant
 //   void pushAddendsWWo( std::set< std::set<uint8_t> > & S, const uint8_t & W, const std::set<uint8_t> & WO ); // with and without variant
@@ -23,11 +27,11 @@ public:
   };
 private:
   void _updatePossibles();
-  bool _oneMore(std::set< uint8_t >& ws, uint8_t last );
-  uint8_t _sum( std::set<uint8_t> & ws );
-  void _show( const std::set< uint8_t >& ws );
+  bool _oneMore(uSet& ws, uint8_t last );
+  uint8_t _sum( uSet & ws );
+  void _show( const uSet& ws );
   uint8_t m_sum;
   uint8_t m_an; // addends numbers
-  std::set< std::set<uint8_t> > S; // solutions
-  std::set<uint8_t> m_possibles;
+  std::set< uSet > S; // solutions
+  uSet m_possibles;
 };

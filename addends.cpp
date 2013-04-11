@@ -17,6 +17,26 @@ Addends::Addends(uint8_t sum, uint8_t an) : m_sum(sum) , m_an(an), S(), m_possib
   }
 }
 
+bool Addends::hasMandatoryElements(uSet& e)
+{
+  bool rc = false;
+  set< uint8_t > first = *(S.begin());
+  for ( set< uint8_t >::iterator i = first.begin(); i != first.end(); ++i ) {
+    set< set<uint8_t> >::iterator k = S.begin();
+    
+    for( ++k; k != S.end(); ++k ) {
+      if( (*k).find( *i ) == (*k).end() ) {
+	break; /* this element is not mandatory */
+      }
+    }
+    if( k == S.end() ) {
+      rc = true;
+      e.insert( *i );
+    }
+  }
+  return rc;
+}
+
 void Addends::_updatePossibles()
 {
   m_possibles.clear();
@@ -29,6 +49,15 @@ void Addends::_updatePossibles()
 
 void Addends::pushAddendsW(const uint8_t W)
 {
+  if( m_an == 9 && m_sum == 45 ) {
+    uSet tmp;
+    for( uint8_t i = 1; i <= 9; ++i ) {
+      tmp.insert( i );
+      m_possibles.insert( i );
+    }
+    S.insert( tmp );
+    return;
+  }
   pushAddends();
   for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
     if( (*i).find( W ) == (*i).end() ) {
@@ -38,13 +67,22 @@ void Addends::pushAddendsW(const uint8_t W)
   _updatePossibles();
 }
 
-void Addends::pushAddendsW(const set< uint8_t >& W)
+void Addends::pushAddendsW(const uSet& W)
 {
+  if( m_an == 9 && m_sum == 45 ) {
+    uSet tmp;
+    for( uint8_t i = 1; i <= 9; ++i ) {
+      tmp.insert( i );
+      m_possibles.insert( i );
+    }
+    S.insert( tmp );
+    return;
+  }
   pushAddends();
-  for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
-    for( set< uint8_t >::iterator j = W.begin(); j != W.end(); ++j ) {
+  for( set< uint8_t >::iterator j = W.begin(); j != W.end(); ++j ) {
+    for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
       if( (*i).find( (*j) ) == (*i).end() ) {
-	S.erase( *i );
+	S.erase( (*i) );
       }
     }
   }
@@ -53,6 +91,15 @@ void Addends::pushAddendsW(const set< uint8_t >& W)
 
 void Addends::pushAddends()
 {
+  if( m_an == 9 && m_sum == 45 ) {
+    uSet tmp;
+    for( uint8_t i = 1; i <= 9; ++i ) {
+      tmp.insert( i );
+      m_possibles.insert( i );
+    }
+    S.insert( tmp );
+    return;
+  }
   S.clear();
   for( uint8_t i = 1; i <= 9; ++i ) {
     set< uint8_t > tmp;
@@ -62,7 +109,7 @@ void Addends::pushAddends()
   _updatePossibles();
 }
 
-bool Addends::_oneMore(set< uint8_t >& ws, uint8_t last)
+bool Addends::_oneMore(uSet& ws, uint8_t last)
 {
   uint8_t tmp = _sum( ws );
   if( tmp > m_sum ) return false;
@@ -82,7 +129,7 @@ bool Addends::_oneMore(set< uint8_t >& ws, uint8_t last)
   return false;
 }
 
-uint8_t Addends::_sum(set< uint8_t >& ws)
+uint8_t Addends::_sum(uSet& ws)
 {
   if( ws.empty() ) {
     return 0;
@@ -94,7 +141,7 @@ uint8_t Addends::_sum(set< uint8_t >& ws)
   return rc;
 }
 
-void Addends::_show(const set< uint8_t >& ws)
+void Addends::_show(const uSet& ws)
 {
   for( set<uint8_t>::iterator i = ws.begin(); i!=ws.end(); ++i ) {
     if( i != ws.begin() ) {
