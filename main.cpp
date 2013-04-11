@@ -17,14 +17,20 @@ int main(int argc, char **argv) {
   Board b;
   b.solve();
 
-//   Addends a(15,3);
+//   Addends a(19,5);
 //   a.pushAddends();
 //   a.show();
-//   std::set< uint8_t > with;
-//   with.insert( 9 );
-//   with.insert( 5 );
-//   a.pushAddendsW( 9 );
+//   a.pushAddendsW( 1 );
 //   a.show();
+//   std::set< uint8_t > with;
+//   with.insert( 1 );
+//   with.insert( 4 );
+//   a.pushAddendsW( with );
+//   a.show();
+//   with.insert( 3 );
+//   a.pushAddendsW( with );
+//   a.show();
+  
   
   return 0;
 }

@@ -59,7 +59,8 @@ void Addends::pushAddendsW(const uint8_t W)
     return;
   }
   pushAddends();
-  for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
+  set< uSet > tmp = S;
+  for( set< uSet >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
     if( (*i).find( W ) == (*i).end() ) {
       S.erase( *i );
     }
@@ -79,8 +80,9 @@ void Addends::pushAddendsW(const uSet& W)
     return;
   }
   pushAddends();
+  set< uSet > tmp = S;
   for( set< uint8_t >::iterator j = W.begin(); j != W.end(); ++j ) {
-    for( set< set<uint8_t> >::iterator i = S.begin(); i != S.end(); ++i ) {
+    for( set< uSet >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
       if( (*i).find( (*j) ) == (*i).end() ) {
 	S.erase( (*i) );
       }

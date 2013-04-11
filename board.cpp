@@ -549,41 +549,41 @@ bool Board::_buildOptiboard()
     return false;
   }
 }
-bool Board::_isImpossibleLine(Cell* c, Board::Line* d, Board::Line* r, Board::Line* col )
-{
-  set< Cell * > tmp;
-  for( Line::iterator i = d->begin(); i != d->end(); ++i ) {
-    if((*i) == c || (*i)->hasValue()) {
-      continue;
-    }
-    tmp.insert( *i );
-  }
-  for( Line::iterator i = r->begin(); i != r->end(); ++i ) {
-    if((*i) == c || (*i)->hasValue()) {
-      continue;
-    }
-    tmp.insert( *i );
-  }
-  for( Line::iterator i = col->begin(); i != col->end(); ++i ) {
-    if((*i) == c || (*i)->hasValue()) {
-      continue;
-    }
-    tmp.insert( *i );
-  }
-  for( set< Cell * >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
-    if( (*i)->isPossiblesEmpty() ) {
-      return true;
-    }
-  }
-  return false;
-}
 
 bool Board::_isImpossible(Cell* c)
 {
   Coordinate::Dial_e dial = c->getDial();
   uint8_t row = c->getRow();
   uint8_t column = c->getColumn();
-  return _isImpossibleLine( c, _dials[ dial ], _rows[ row ], _columns[ column ] );
+  set< Cell * > tmp;
+  for( Line::iterator i = _dials[ dial ]->begin(); i != _dials[ dial ]->end(); ++i ) {
+    if((*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  for( Line::iterator i = _rows[ row ]->begin(); i != _rows[ row ]->end(); ++i ) {
+    if((*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  for( Line::iterator i = _columns[ column ]->begin(); i != _columns[ column ]->end(); ++i ) {
+    if((*i)->hasValue()) {
+      continue;
+    }
+    tmp.insert( *i );
+  }
+  if( tmp.size() > 9 ) {
+    return false;
+  } else {
+    for( set< Cell * >::iterator i = tmp.begin(); i != tmp.end(); ++i ) {
+      if( (*i)->isPossiblesEmpty() ) {
+	return true;
+      }
+    }
+  }
+  return false;
 }
 
 void Board::solve()
@@ -641,14 +641,14 @@ bool Board::_solve( std::vector< Cell* >::iterator i )
   }
   for( uSet::iterator j = p.begin(); j != p.end(); ++j ) {
     (*i)->setValue( *j );
-//     if( _isImpossible( (*i) ) ) {
-//       ++iterations;
-//       if( iterations % 10000 == 0 ) {
-// 	show();
-//       }
-//       (*i)->setValue( 0 );
-//       continue;
-//     }
+    if( _isImpossible( (*i) ) ) {
+      ++iterations;
+      if( iterations % 10000 == 0 ) {
+	show();
+      }
+      (*i)->setValue( 0 );
+      continue;
+    }
     ++i;
     if( _solve( i ) == true ) {
       return true;

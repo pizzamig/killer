@@ -26,7 +26,6 @@ private:
   bool _solve( std::vector< Cell* >::iterator );
   bool _buildOptiboard();
   bool _isImpossible( Cell * c );
-  bool _isImpossibleLine( Cell* c, Board::Line* d, Board::Line* r, Board::Line* col );
   vector< Cell * > _board;
   vector< Cell * > _optiBoard;
   vector< Line * > _rows;
